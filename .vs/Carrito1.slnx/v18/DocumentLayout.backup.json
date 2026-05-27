@@ -3,7 +3,11 @@
   "WorkspaceRootPath": "C:\\Users\\alanc\\Documentos\\Carrito\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{73AD39B8-DFEC-4788-9E19-FAFBB53D119B}|Carrito1\\Carrito1.csproj|c:\\users\\alanc\\documentos\\carrito\\carrito1\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{73AD39B8-DFEC-4788-9E19-FAFBB53D119B}|Carrito1\\Carrito1.csproj|c:\\users\\alanc\\documentos\\carrito\\carrito1\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73AD39B8-DFEC-4788-9E19-FAFBB53D119B}|Carrito1\\Carrito1.csproj|solutionrelative:carrito1\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73AD39B8-DFEC-4788-9E19-FAFBB53D119B}|Carrito1\\Carrito1.csproj|C:\\Users\\alanc\\Documentos\\Carrito\\carrito1\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{73AD39B8-DFEC-4788-9E19-FAFBB53D119B}|Carrito1\\Carrito1.csproj|solutionrelative:carrito1\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -27,15 +31,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "Form1.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\alanc\\Documentos\\Carrito\\Carrito1\\Form1.Designer.cs",
+              "RelativeDocumentMoniker": "Carrito1\\Form1.Designer.cs",
+              "ToolTip": "C:\\Users\\alanc\\Documentos\\Carrito\\Carrito1\\Form1.Designer.cs",
+              "RelativeToolTip": "Carrito1\\Form1.Designer.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAAAmwCcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-26T20:55:02.036Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "Form1.cs",
               "DocumentMoniker": "C:\\Users\\alanc\\Documentos\\Carrito\\Carrito1\\Form1.cs",
               "RelativeDocumentMoniker": "Carrito1\\Form1.cs",
               "ToolTip": "C:\\Users\\alanc\\Documentos\\Carrito\\Carrito1\\Form1.cs",
               "RelativeToolTip": "Carrito1\\Form1.cs",
-              "ViewState": "AgIAAGMCAAAAAAAAAAAowHMCAAANAAAAAAAAAA==",
+              "ViewState": "AgIAACwAAAAAAAAAAAAAwEsCAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-24T01:48:10.527Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-24T01:48:10.527Z"
             }
           ]
         }
