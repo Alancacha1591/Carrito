@@ -34,7 +34,9 @@ namespace Carrito1
 
         // Ajuste motores (expuestos en UI)
         private TextBox txtSpeedL, txtSpeedR, txtKp;
+        private TextBox txtEmpujeIzq;
         private TextBox txtPpc, txtGiro;
+        private TextBox txtPausaMs;
 
         // ─── Serial / Estado ──────────────────────────────────
         private SerialPort puertoSerial;
@@ -77,7 +79,7 @@ namespace Carrito1
                 Size = new Size(this.ClientSize.Width, 80),
                 Location = new Point(0, 0),
                 BackColor = Color.FromArgb(145, 110, 10),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+                Dock = DockStyle.Top
             };
             barraSuperior.Controls.Add(new Label
             {
@@ -258,6 +260,29 @@ namespace Carrito1
             panelMotores.Controls.Add(txtSpeedL);
             panelMotores.Controls.Add(txtSpeedR);
             panelMotores.Controls.Add(txtKp);
+
+            my += 30;
+            panelMotores.Controls.Add(new Label
+            {
+                Text = "Va a la derecha → baja R  |  Va a la izquierda → baja L",
+                Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                ForeColor = Color.Gray,
+                Location = new Point(mx, my),
+                AutoSize = true
+            });
+
+            my += 22;
+            panelMotores.Controls.Add(new Label { Text = "Empuje Izq (giro L):", Location = new Point(mx, my + 3), AutoSize = true, Font = new Font("Segoe UI", 9) });
+            txtEmpujeIzq = new TextBox { Location = new Point(mx + 155, my), Size = new Size(65, 26), Text = "230", Font = new Font("Segoe UI", 11) };
+            panelMotores.Controls.Add(txtEmpujeIzq);
+            panelMotores.Controls.Add(new Label
+            {
+                Text = "← solo durante giro izq",
+                Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                ForeColor = Color.Gray,
+                Location = new Point(mx + 230, my + 5),
+                AutoSize = true
+            });
 
             // Botón aplicar motores (al lado de los textboxes)
             var btnAplicarMotores = CrearBoton("Aplicar", new Point(mx + 300, my - 2), new Size(80, 26), Color.FromArgb(35, 135, 210));
