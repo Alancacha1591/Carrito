@@ -1,5 +1,5 @@
 ﻿// ════════════════════════════════════════════════════════════
-//  LA JEEPETA — Control PC v3
+//  LA JEEPETA — Control PC v6
 //  Windows Forms — Comunicación Serial USB con ESP32
 //
 //  PROTOCOLO ESP32:
@@ -35,7 +35,7 @@ namespace Carrito1
 
         // Ajuste motores (expuestos en UI)
         private TextBox txtSpeedL, txtSpeedR, txtKp;
-        private TextBox txtEmpujeIzq;
+        private TextBox txtEmpujeIzq, txtEmpujeDer;
         private TextBox txtPpc, txtGiro;
         private TextBox txtPausaMs;
 
@@ -255,7 +255,7 @@ namespace Carrito1
             Panel panelMotores = new Panel
             {
                 Location = new Point(30, y),
-                Size = new Size(500, 175),
+                Size = new Size(500, 210),
                 BackColor = Color.FromArgb(240, 248, 255),
                 BorderStyle = BorderStyle.FixedSingle
             };
@@ -317,7 +317,34 @@ namespace Carrito1
             panelMotores.Controls.Add(txtEmpujeIzq);
             panelMotores.Controls.Add(new Label
             {
-                Text = "← solo durante ese giro, luego vuelve a L normal",
+                Text = "← solo durante giro L",
+                Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                ForeColor = Color.Gray,
+                Location = new Point(mx + 245, my + 3),
+                AutoSize = true
+            });
+
+            my += 30;
+            // Empuje extra giro derecha
+            panelMotores.Controls.Add(new Label
+            {
+                Text = "Empuje Der (solo giro R):",
+                Font = new Font("Segoe UI", 9),
+                ForeColor = Color.FromArgb(120, 60, 0),
+                Location = new Point(mx, my),
+                AutoSize = true
+            });
+            txtEmpujeDer = new TextBox
+            {
+                Location = new Point(mx + 175, my - 2),
+                Size = new Size(60, 26),
+                Text = "230",
+                Font = new Font("Segoe UI", 11)
+            };
+            panelMotores.Controls.Add(txtEmpujeDer);
+            panelMotores.Controls.Add(new Label
+            {
+                Text = "← solo durante giro R",
                 Font = new Font("Segoe UI", 8, FontStyle.Italic),
                 ForeColor = Color.Gray,
                 Location = new Point(mx + 245, my + 3),
@@ -342,7 +369,7 @@ namespace Carrito1
             };
             panelMotores.Controls.Add(btnAplicarMotores);
 
-            y += 190;
+            y += 225;
 
             // — Separador —
             tarjetaConfig.Controls.Add(Separador(y)); y += 18;
@@ -585,11 +612,7 @@ namespace Carrito1
         {
             if (!esp32Conectado || puertoSerial == null || !puertoSerial.IsOpen) return;
             try { puertoSerial.WriteLine(comando); }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error enviando comando:\n{ex.Message}", "Error",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            catch { /* Puerto cerrado inesperadamente — ignorar silenciosamente */ }
         }
 
         // ════════════════════════════════════════════════════════
@@ -701,10 +724,17 @@ namespace Carrito1
                 // Girar según diferencia de orientación
                 if (diferencia == 1)
                 {
+                    // Giro derecha: aplicar empuje extra al motor derecho
+                    int sL2 = int.TryParse(txtSpeedL.Text, out int _sL2) ? _sL2 : 160;
+                    int sR2 = int.TryParse(txtSpeedR.Text, out int _sR2) ? _sR2 : 200;
+                    int empujeDer = int.TryParse(txtEmpujeDer.Text, out int _ed) ? _ed : 230;
+                    EnviarComando($"C,{sL2},{empujeDer}");
+                    await Task.Delay(50);
                     tcs = new TaskCompletionSource<bool>();
                     EnviarComando("A,R,90,giro");
                     await Task.WhenAny(tcs.Task, Task.Delay(6000));
-                    await Task.Delay(pausa);   // ← pausa tras el giro
+                    await Task.Delay(pausa);
+                    EnviarComando($"C,{sL2},{sR2}");
                 }
                 else if (diferencia == 3)
                 {
