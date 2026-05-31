@@ -66,8 +66,9 @@ namespace Carrito1
         {
             InitializeComponent();
             this.DoubleBuffered = true;
-            this.StartPosition = FormStartPosition.CenterScreen;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
             this.WindowState = FormWindowState.Maximized;
+            this.StartPosition = FormStartPosition.CenterScreen;
             this.AutoScroll = false;
             CrearInterfaz();
             IniciarXbox();
@@ -81,278 +82,239 @@ namespace Carrito1
             this.Text = "La Jeepeta — Control";
             this.BackColor = Color.FromArgb(245, 245, 245);
 
-            // ── Barra superior ──────────────────────────────────
-            Panel barraSuperior = new Panel
+            int W = this.ClientSize.Width;
+            int H = this.ClientSize.Height;
+            int TOP = 65; // altura barra superior
+
+            // ── Barra superior ────────────────────────────────────────
+            Panel barra = new Panel
             {
-                Size = new Size(this.ClientSize.Width, 60),
                 Location = new Point(0, 0),
+                Size = new Size(W, TOP),
                 BackColor = Color.FromArgb(145, 110, 10),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
-            barraSuperior.Controls.Add(new Label
+            barra.Controls.Add(new Label
             {
                 Text = "LA JEEPETA — CONTROL DE MOVIMIENTO",
                 Font = new Font("Segoe UI", 18, FontStyle.Bold),
                 ForeColor = Color.White,
-                AutoSize = false,
-                Size = new Size(this.ClientSize.Width, 50),
-                Location = new Point(0, 5),
+                Dock = DockStyle.Fill,
                 TextAlign = ContentAlignment.MiddleCenter
             });
-            this.Controls.Add(barraSuperior);
+            this.Controls.Add(barra);
 
-            // ── Tarjeta Dibujo ──────────────────────────────────
-            Panel tarjetaDibujo = CrearTarjeta(new Point(30, 80), new Size(640, this.ClientSize.Height - 100));
-            this.Controls.Add(tarjetaDibujo);
+            // Dimensiones de columnas
+            int PAD = 18;
+            int colW1 = (int)(W * 0.606);             // Retícula
+            int colW2 = (int)(W * 0.35);             // Config izq
+            int colW3 = (int)(W * 0.45) - PAD * 2;   // Config der (ajustable)
+            int colH = H - TOP - PAD * 2;
 
-            tarjetaDibujo.Controls.Add(new Label
+            int x1 = PAD;
+            int x2 = x1 + colW1 + PAD;
+            int x3 = x2 + colW2 + PAD;
+            int yTop = TOP + PAD;
+
+            // ══════════════════════════════════════════════════════════
+            //  COLUMNA 1 — Área de dibujo
+            // ══════════════════════════════════════════════════════════
+            Panel colDibujo = new Panel
+            {
+                Location = new Point(x1, yTop),
+                Size = new Size(colW1, colH),
+                BackColor = Color.White,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom
+            };
+            this.Controls.Add(colDibujo);
+
+            colDibujo.Controls.Add(new Label
             {
                 Text = "Área de dibujo",
-                Font = new Font("Segoe UI", 14, FontStyle.Bold),
-                Location = new Point(20, 15),
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                Location = new Point(8, 8),
                 AutoSize = true
             });
 
             pictureDibujo = new PictureBox
             {
-                Location = new Point(20, 50),
-                Size = new Size(600, this.ClientSize.Height - 150),
+                Location = new Point(8, 36),
+                Size = new Size(colW1 - 16, colH - 44),
                 BackColor = Color.White,
-                BorderStyle = BorderStyle.FixedSingle
+                BorderStyle = BorderStyle.FixedSingle,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right
             };
             pictureDibujo.MouseDown += PictureDibujo_MouseDown;
             pictureDibujo.MouseUp += PictureDibujo_MouseUp;
             pictureDibujo.Paint += PictureDibujo_Paint;
-            tarjetaDibujo.Controls.Add(pictureDibujo);
+            colDibujo.Controls.Add(pictureDibujo);
 
-            // ── Tarjeta Configuración (columna derecha) ─────────
-            // Altura aumentada para acomodar todas las secciones sin amontonarse
-            // Contenedor con scroll para la columna de configuración
-            Panel scrollPanel = new Panel
+            // ══════════════════════════════════════════════════════════
+            //  COLUMNA 2 — Configuración (Puntos / Unidad / Conexión / Modo)
+            // ══════════════════════════════════════════════════════════
+            Panel col2 = new Panel
             {
-                Location = new Point(700, 80),
-                Size = new Size(this.ClientSize.Width - 720, this.ClientSize.Height - 90),
-                AutoScroll = true,
+                Location = new Point(x2, yTop),
+                Size = new Size(colW2, colH),
                 BackColor = Color.FromArgb(245, 245, 245),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom
             };
-            this.Controls.Add(scrollPanel);
+            this.Controls.Add(col2);
 
-            Panel tarjetaConfig = new Panel
-            {
-                Location = new Point(0, 0),
-                Width = 550,
-                Height = 1300,
-                BackColor = Color.FromArgb(245, 245, 245)
-            };
+            int y = 0;
 
-            int y = 20; // cursor vertical
-
-            // — Título —
-            AgregarLabel(tarjetaConfig, "Configuración", 16, new Point(30, y));
-            y += 55;
+            AgregarLabel(col2, "Configuración", 14, new Point(0, y)); y += 38;
 
             // — Tabla de puntos —
-            AgregarLabel(tarjetaConfig, "Puntos de Trayectoria", 12, new Point(30, y));
-            y += 28;
-
+            AgregarLabel(col2, "Puntos de Trayectoria", 10, new Point(0, y)); y += 22;
             tablaCoordenadas = new DataGridView
             {
-                Location = new Point(30, y),
-                Size = new Size(500, 130),
+                Location = new Point(0, y),
+                Size = new Size(colW2, 115),
                 AllowUserToAddRows = false,
                 ReadOnly = true,
                 RowHeadersVisible = false,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 BackgroundColor = Color.White,
                 ColumnCount = 5,
-                Font = new Font("Segoe UI", 9)
+                Font = new Font("Segoe UI", 8)
             };
             tablaCoordenadas.Columns[0].Name = "Punto";
             tablaCoordenadas.Columns[1].Name = "X";
             tablaCoordenadas.Columns[2].Name = "Y";
             tablaCoordenadas.Columns[3].Name = "(X,Y)";
-            tablaCoordenadas.Columns[4].Name = "Distancia";
-            tarjetaConfig.Controls.Add(tablaCoordenadas);
-            y += 145;
+            tablaCoordenadas.Columns[4].Name = "Dist.";
+            col2.Controls.Add(tablaCoordenadas);
+            y += 124;
 
-            // — Separador visual —
-            tarjetaConfig.Controls.Add(Separador(y)); y += 18;
+            col2.Controls.Add(Sep2(y, colW2)); y += 14;
 
             // — Unidad de Medida —
-            AgregarLabel(tarjetaConfig, "Unidad de Medida", 12, new Point(30, y)); y += 28;
-
-            btnCentimetros = CrearBoton("Centímetros", new Point(30, y), new Size(230, 36), Color.FromArgb(55, 180, 125));
+            AgregarLabel(col2, "Unidad de Medida", 10, new Point(0, y)); y += 22;
+            int bw2 = (colW2 - 6) / 2;
+            btnCentimetros = CrearBoton("Centímetros", new Point(0, y), new Size(bw2, 32), Color.FromArgb(55, 180, 125));
             btnCentimetros.Click += (s, e) => SeleccionarUnidad("cm");
-            tarjetaConfig.Controls.Add(btnCentimetros);
-
-            btnMetros = CrearBoton("Metros", new Point(275, y), new Size(230, 36), Color.FromArgb(210, 210, 210));
+            col2.Controls.Add(btnCentimetros);
+            btnMetros = CrearBoton("Metros", new Point(bw2 + 6, y), new Size(bw2, 32), Color.FromArgb(210, 210, 210));
             btnMetros.ForeColor = Color.Black;
             btnMetros.Click += (s, e) => SeleccionarUnidad("m");
-            tarjetaConfig.Controls.Add(btnMetros);
-            y += 52;
+            col2.Controls.Add(btnMetros);
+            y += 42;
 
-            // — Separador —
-            tarjetaConfig.Controls.Add(Separador(y)); y += 18;
+            col2.Controls.Add(Sep2(y, colW2)); y += 14;
 
-            // — Conexión ESP32 —
-            AgregarLabel(tarjetaConfig, "Conexión USB — ESP32", 12, new Point(30, y)); y += 28;
-
-            cmbPuertos = new ComboBox { Location = new Point(30, y), Size = new Size(130, 28), Font = new Font("Segoe UI", 10) };
-            tarjetaConfig.Controls.Add(cmbPuertos);
-
-            btnRefrescarPuertos = CrearBoton("↻", new Point(170, y - 2), new Size(38, 32), Color.FromArgb(80, 80, 80));
+            // — Conexión —
+            AgregarLabel(col2, "Conexión USB — ESP32", 10, new Point(0, y)); y += 22;
+            cmbPuertos = new ComboBox { Location = new Point(0, y), Size = new Size(colW2 - 160, 26), Font = new Font("Segoe UI", 9) };
+            col2.Controls.Add(cmbPuertos);
+            btnRefrescarPuertos = CrearBoton("↻", new Point(colW2 - 155, y - 1), new Size(30, 28), Color.FromArgb(80, 80, 80));
             btnRefrescarPuertos.Click += (s, e) => CargarPuertos();
-            tarjetaConfig.Controls.Add(btnRefrescarPuertos);
-
-            btnConectar = CrearBoton("Conectar", new Point(218, y - 2), new Size(115, 32), Color.FromArgb(35, 135, 210));
+            col2.Controls.Add(btnRefrescarPuertos);
+            btnConectar = CrearBoton("Conectar", new Point(colW2 - 120, y - 1), new Size(120, 28), Color.FromArgb(35, 135, 210));
             btnConectar.Click += BtnConectar_Click;
-            tarjetaConfig.Controls.Add(btnConectar);
-
+            col2.Controls.Add(btnConectar);
+            y += 34;
             lblEstadoConexion = new Label
             {
                 Text = "● No conectado",
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 ForeColor = Color.Red,
-                Location = new Point(342, y + 3),
+                Location = new Point(0, y),
                 AutoSize = true
             };
-            tarjetaConfig.Controls.Add(lblEstadoConexion);
-            y += 48;
+            col2.Controls.Add(lblEstadoConexion);
+            y += 28;
 
-            // — Separador —
-            tarjetaConfig.Controls.Add(Separador(y)); y += 18;
+            col2.Controls.Add(Sep2(y, colW2)); y += 14;
 
             // — Modo de operación —
-            AgregarLabel(tarjetaConfig, "Modo de operación", 12, new Point(30, y)); y += 28;
-
-            btnModoManual = CrearBoton("Modo Manual", new Point(30, y), new Size(230, 36), Color.FromArgb(80, 80, 80));
+            AgregarLabel(col2, "Modo de operación", 10, new Point(0, y)); y += 22;
+            btnModoManual = CrearBoton("Modo Manual", new Point(0, y), new Size(bw2, 32), Color.FromArgb(80, 80, 80));
             btnModoManual.Click += BtnModoManual_Click;
-            tarjetaConfig.Controls.Add(btnModoManual);
-
-            btnModoAuto = CrearBoton("Modo Autónomo", new Point(275, y), new Size(230, 36), Color.FromArgb(80, 80, 80));
+            col2.Controls.Add(btnModoManual);
+            btnModoAuto = CrearBoton("Modo Autónomo", new Point(bw2 + 6, y), new Size(bw2, 32), Color.FromArgb(80, 80, 80));
             btnModoAuto.Click += BtnModoAuto_Click;
-            tarjetaConfig.Controls.Add(btnModoAuto);
-            y += 44;
-
+            col2.Controls.Add(btnModoAuto);
+            y += 40;
             lblModoActual = new Label
             {
                 Text = "Modo actual: Ninguno",
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(30, y),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Location = new Point(0, y),
                 AutoSize = true
             };
-            tarjetaConfig.Controls.Add(lblModoActual);
-            y += 35;
+            col2.Controls.Add(lblModoActual);
 
-            // — Separador —
-            tarjetaConfig.Controls.Add(Separador(y)); y += 18;
+            // ══════════════════════════════════════════════════════════
+            //  COLUMNA 3 — Motores / Calibración / Acciones
+            // ══════════════════════════════════════════════════════════
+            Panel col3 = new Panel
+            {
+                Location = new Point(x3, 143),
+                Size = new Size(colW3, colH),
+                BackColor = Color.FromArgb(245, 245, 245),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
+            };
+            this.Controls.Add(col3);
 
-            // ════════════════════════════════════════════════════
-            //  PANEL: AJUSTE DE MOTORES
-            //  ← Aquí es donde corriges que el carrito vaya chueco
-            // ════════════════════════════════════════════════════
+            int y3 = 0;
+            int pw = colW3 - 4; // ancho interno de paneles
+
+            // ── Panel Motores ─────────────────────────────────────────
             Panel panelMotores = new Panel
             {
-                Location = new Point(30, y),
-                Size = new Size(500, 210),
+                Location = new Point(0, y3),
+                Size = new Size(pw, 180),
                 BackColor = Color.FromArgb(240, 248, 255),
                 BorderStyle = BorderStyle.FixedSingle
             };
-            tarjetaConfig.Controls.Add(panelMotores);
+            col3.Controls.Add(panelMotores);
 
             panelMotores.Controls.Add(new Label
             {
-                Text = "⚙ Ajuste de Motores  (corrige si va chueco)",
+                Text = "⚙  Ajuste de Motores  (corrige si va chueco)",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 ForeColor = Color.FromArgb(30, 80, 150),
                 Location = new Point(10, 8),
                 AutoSize = true
             });
 
-            // Fila 1: Speed L / Speed R / Kp
-            int mx = 10, my = 35;
+            int mx = 10, my = 34;
+            int col3w = (pw - 30) / 3;
             panelMotores.Controls.Add(new Label { Text = "Motor Izq (L)", Location = new Point(mx, my), AutoSize = true, Font = new Font("Segoe UI", 9) });
-            panelMotores.Controls.Add(new Label { Text = "Motor Der (R)", Location = new Point(mx + 160, my), AutoSize = true, Font = new Font("Segoe UI", 9) });
-            panelMotores.Controls.Add(new Label { Text = "Kp corrección", Location = new Point(mx + 320, my), AutoSize = true, Font = new Font("Segoe UI", 9) });
-
+            panelMotores.Controls.Add(new Label { Text = "Motor Der (R)", Location = new Point(mx + col3w, my), AutoSize = true, Font = new Font("Segoe UI", 9) });
+            panelMotores.Controls.Add(new Label { Text = "Kp corrección", Location = new Point(mx + col3w * 2, my), AutoSize = true, Font = new Font("Segoe UI", 9) });
             my += 20;
-            txtSpeedL = new TextBox { Location = new Point(mx, my), Size = new Size(70, 26), Text = "255", Font = new Font("Segoe UI", 11) };
-            txtSpeedR = new TextBox { Location = new Point(mx + 160, my), Size = new Size(70, 26), Text = "225", Font = new Font("Segoe UI", 11) };
-            txtKp = new TextBox { Location = new Point(mx + 320, my), Size = new Size(70, 26), Text = "1.5", Font = new Font("Segoe UI", 11) };
+            txtSpeedL = new TextBox { Location = new Point(mx, my), Size = new Size(col3w - 10, 26), Text = "200", Font = new Font("Segoe UI", 11) };
+            txtSpeedR = new TextBox { Location = new Point(mx + col3w, my), Size = new Size(col3w - 10, 26), Text = "225", Font = new Font("Segoe UI", 11) };
+            txtKp = new TextBox { Location = new Point(mx + col3w * 2, my), Size = new Size(col3w - 10, 26), Text = "1.5", Font = new Font("Segoe UI", 11) };
             panelMotores.Controls.Add(txtSpeedL);
             panelMotores.Controls.Add(txtSpeedR);
             panelMotores.Controls.Add(txtKp);
 
-            // Nota de ayuda
-            my += 32;
+            my += 30;
             panelMotores.Controls.Add(new Label
             {
-                Text = "Va a la derecha → baja Motor Der (R) | Va a la izq → baja Motor Izq (L)",
+                Text = "Va a la derecha → baja R  |  Va a la izquierda → baja L",
                 Font = new Font("Segoe UI", 8, FontStyle.Italic),
                 ForeColor = Color.Gray,
                 Location = new Point(mx, my),
                 AutoSize = true
             });
 
-            // Botón aplicar motores
-            my += 22;
-
-            // Fila 2: Empuje extra giro izquierda
-            panelMotores.Controls.Add(new Label
-            {
-                Text = "Empuje Izq (solo giro L):",
-                Font = new Font("Segoe UI", 9),
-                ForeColor = Color.FromArgb(120, 60, 0),
-                Location = new Point(mx, my),
-                AutoSize = true
-            });
-            txtEmpujeIzq = new TextBox
-            {
-                Location = new Point(mx + 175, my - 2),
-                Size = new Size(60, 26),
-                Text = "230",
-                Font = new Font("Segoe UI", 11)
-            };
+            my += 20;
+            int lw = (pw - 30) / 2 - 5;
+            // Empuje izq
+            panelMotores.Controls.Add(new Label { Text = "Empuje Izq (giro L):", Location = new Point(mx, my + 4), AutoSize = true, Font = new Font("Segoe UI", 9), ForeColor = Color.FromArgb(120, 60, 0) });
+            txtEmpujeIzq = new TextBox { Location = new Point(mx + 145, my), Size = new Size(55, 26), Text = "230", Font = new Font("Segoe UI", 11) };
             panelMotores.Controls.Add(txtEmpujeIzq);
-            panelMotores.Controls.Add(new Label
-            {
-                Text = "← solo durante giro L",
-                Font = new Font("Segoe UI", 8, FontStyle.Italic),
-                ForeColor = Color.Gray,
-                Location = new Point(mx + 245, my + 3),
-                AutoSize = true
-            });
-
-            my += 30;
-            // Empuje extra giro derecha
-            panelMotores.Controls.Add(new Label
-            {
-                Text = "Empuje Der (solo giro R):",
-                Font = new Font("Segoe UI", 9),
-                ForeColor = Color.FromArgb(120, 60, 0),
-                Location = new Point(mx, my),
-                AutoSize = true
-            });
-            txtEmpujeDer = new TextBox
-            {
-                Location = new Point(mx + 175, my - 2),
-                Size = new Size(60, 26),
-                Text = "230",
-                Font = new Font("Segoe UI", 11)
-            };
+            // Empuje der
+            panelMotores.Controls.Add(new Label { Text = "Empuje Der (giro R):", Location = new Point(mx + lw + 10, my + 4), AutoSize = true, Font = new Font("Segoe UI", 9), ForeColor = Color.FromArgb(120, 60, 0) });
+            txtEmpujeDer = new TextBox { Location = new Point(mx + lw + 155, my), Size = new Size(55, 26), Text = "230", Font = new Font("Segoe UI", 11) };
             panelMotores.Controls.Add(txtEmpujeDer);
-            panelMotores.Controls.Add(new Label
-            {
-                Text = "← solo durante giro R",
-                Font = new Font("Segoe UI", 8, FontStyle.Italic),
-                ForeColor = Color.Gray,
-                Location = new Point(mx + 245, my + 3),
-                AutoSize = true
-            });
 
-            my += 30;
-            var btnAplicarMotores = CrearBoton("Aplicar Motores", new Point(mx, my), new Size(160, 32), Color.FromArgb(35, 135, 210));
+            my += 34;
+            var btnAplicarMotores = CrearBoton("Aplicar Motores", new Point(mx, my), new Size(150, 30), Color.FromArgb(35, 135, 210));
             btnAplicarMotores.Click += (s, e) =>
             {
                 if (int.TryParse(txtSpeedL.Text, out int sL) &&
@@ -365,132 +327,105 @@ namespace Carrito1
                     EnviarComando($"KP,{kp:0.00}");
                 }
                 else
-                    MessageBox.Show("Valores inválidos. Usa números enteros para L/R y decimal para Kp.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Valores inválidos.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             };
             panelMotores.Controls.Add(btnAplicarMotores);
 
-            y += 225;
+            y3 += 190;
 
-            // — Separador —
-            tarjetaConfig.Controls.Add(Separador(y)); y += 18;
-
-            // ════════════════════════════════════════════════════
-            //  PANEL: CALIBRACIÓN DE ENCODERS
-            // ════════════════════════════════════════════════════
+            // ── Panel Calibración ─────────────────────────────────────
             Panel panelCal = new Panel
             {
-                Location = new Point(30, y),
-                Size = new Size(500, 130),
+                Location = new Point(0, 190),
+                Size = new Size(pw, 130),
                 BackColor = Color.FromArgb(255, 248, 235),
                 BorderStyle = BorderStyle.FixedSingle
             };
-            tarjetaConfig.Controls.Add(panelCal);
+            col3.Controls.Add(panelCal);
 
             panelCal.Controls.Add(new Label
             {
-                Text = "📏 Calibración de Encoders",
+                Text = "📏  Calibración de Encoders",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 ForeColor = Color.FromArgb(150, 80, 10),
                 Location = new Point(10, 8),
                 AutoSize = true
             });
 
-            int cx = 10, cy = 35;
+            int cx = 10, cy = 34;
             panelCal.Controls.Add(new Label { Text = "pulsos / cm", Location = new Point(cx, cy), AutoSize = true, Font = new Font("Segoe UI", 9) });
-            panelCal.Controls.Add(new Label { Text = "pulsos / 90°", Location = new Point(cx + 180, cy), AutoSize = true, Font = new Font("Segoe UI", 9) });
-
+            panelCal.Controls.Add(new Label { Text = "pulsos / 90°", Location = new Point(cx + 160, cy), AutoSize = true, Font = new Font("Segoe UI", 9) });
             cy += 20;
-            txtPpc = new TextBox { Location = new Point(cx, cy), Size = new Size(80, 26), Text = "20.0", Font = new Font("Segoe UI", 11) };
-            txtGiro = new TextBox { Location = new Point(cx + 180, cy), Size = new Size(80, 26), Text = "180", Font = new Font("Segoe UI", 11) };
+            txtPpc = new TextBox { Location = new Point(cx, cy), Size = new Size(75, 26), Text = "0.8", Font = new Font("Segoe UI", 11) };
+            txtGiro = new TextBox { Location = new Point(cx + 160, cy), Size = new Size(75, 26), Text = "14", Font = new Font("Segoe UI", 11) };
             panelCal.Controls.Add(txtPpc);
             panelCal.Controls.Add(txtGiro);
 
-            var btnAplicarCfg = CrearBoton("Aplicar", new Point(cx + 360, cy - 2), new Size(110, 32), Color.FromArgb(55, 140, 80));
+            var btnAplicarCfg = CrearBoton("Aplicar", new Point(cx + 310, cy - 2), new Size(95, 30), Color.FromArgb(55, 140, 80));
             btnAplicarCfg.Click += (s, e) =>
             {
                 if (float.TryParse(txtPpc.Text.Replace(',', '.'),
                         System.Globalization.NumberStyles.Float,
                         System.Globalization.CultureInfo.InvariantCulture, out float ppc) &&
                     int.TryParse(txtGiro.Text, out int g))
-                {
                     EnviarComando($"CFG,{ppc:0.0},{g}");
-                }
                 else
                     MessageBox.Show("Valores inválidos.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             };
             panelCal.Controls.Add(btnAplicarCfg);
 
-            cy += 40;
-            var btnCalibrar = CrearBoton("🔧 Calibrar en pista", new Point(cx, cy), new Size(200, 32), Color.FromArgb(170, 100, 10));
+            cy += 38;
+            var btnCalibrar = CrearBoton("🔧 Calibrar en pista", new Point(cx, cy), new Size(185, 30), Color.FromArgb(170, 100, 10));
             btnCalibrar.Click += async (s, e) =>
             {
                 if (!VerificarConexion()) return;
                 EnviarComando("CAL_START");
                 await Task.Delay(100);
-                MessageBox.Show(
-                    "Mueve el carrito exactamente 100 cm hacia adelante y presiona OK.",
-                    "Calibración en curso",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Mueve el carrito exactamente 100 cm y presiona OK.",
+                    "Calibración en curso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 EnviarComando("CAL_STOP");
                 MessageBox.Show(
-                    "Revisa el Monitor Serial del ESP32 para ver el resultado (CAL_RESULT,izq,der).\n" +
-                    "Divide el promedio entre 100 y escríbelo en 'pulsos/cm'.",
-                    "Resultado de calibración",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    "Revisa el Monitor Serial (CAL_RESULT,izq,der).\nPromedio ÷ 100 = pulsos/cm.",
+                    "Resultado", MessageBoxButtons.OK, MessageBoxIcon.Information);
             };
             panelCal.Controls.Add(btnCalibrar);
 
-            y += 145;
+            y3 += 137;
 
-            // — Separador —
-            tarjetaConfig.Controls.Add(Separador(y)); y += 18;
-
-            // ════════════════════════════════════════════════════
-            //  ACCIONES
-            // ════════════════════════════════════════════════════
-            AgregarLabel(tarjetaConfig, "Acciones", 12, new Point(30, y)); y += 28;
-
-            // Pausa entre comandos
-            tarjetaConfig.Controls.Add(new Label
+            // ── Acciones ──────────────────────────────────────────────
+            y3 += 10;
+            col3.Controls.Add(new Label
             {
-                Text = "Pausa entre tramos:",
-                Font = new Font("Segoe UI", 9),
-                Location = new Point(30, y + 4),
+                Text = "Acciones",
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Location = new Point(0, y3),
                 AutoSize = true
             });
-            txtPausaMs = new TextBox
-            {
-                Location = new Point(178, y),
-                Size = new Size(65, 26),
-                Text = "800",
-                Font = new Font("Segoe UI", 11)
-            };
-            tarjetaConfig.Controls.Add(txtPausaMs);
-            tarjetaConfig.Controls.Add(new Label
-            {
-                Text = "ms",
-                Font = new Font("Segoe UI", 9),
-                Location = new Point(250, y + 4),
-                AutoSize = true
-            });
-            y += 36;
+            y3 += 28;
 
-            btnEnviar = CrearBoton("▶ Ejecutar", new Point(30, y), new Size(155, 42), Color.FromArgb(35, 135, 210));
+            col3.Controls.Add(new Label { Text = "Pausa entre tramos:", Location = new Point(0, y3 + 5), AutoSize = true, Font = new Font("Segoe UI", 9) });
+            txtPausaMs = new TextBox { Location = new Point(148, y3), Size = new Size(58, 26), Text = "1500", Font = new Font("Segoe UI", 11) };
+            col3.Controls.Add(txtPausaMs);
+            col3.Controls.Add(new Label { Text = "ms", Location = new Point(212, y3 + 5), AutoSize = true, Font = new Font("Segoe UI", 9) });
+            y3 += 36;
+
+            int bwa = (pw - 12) / 3;
+            btnEnviar = CrearBoton("▶ Ejecutar", new Point(0, y3), new Size(bwa, 38), Color.FromArgb(35, 135, 210));
+            btnPausar = CrearBoton("⏸ Pausar", new Point(bwa + 6, y3), new Size(bwa, 38), Color.FromArgb(245, 190, 40));
+            btnLimpiar = CrearBoton("✕ Limpiar", new Point((bwa + 6) * 2, y3), new Size(bwa, 38), Color.FromArgb(215, 55, 55));
             btnEnviar.Click += BtnEnviar_Click;
-            tarjetaConfig.Controls.Add(btnEnviar);
-
-            btnPausar = CrearBoton("⏸ Pausar", new Point(198, y), new Size(140, 42), Color.FromArgb(245, 190, 40));
             btnPausar.Click += (s, e) => EnviarComando("S");
-            tarjetaConfig.Controls.Add(btnPausar);
-
-            btnLimpiar = CrearBoton("✕ Limpiar", new Point(352, y), new Size(155, 42), Color.FromArgb(215, 55, 55));
             btnLimpiar.Click += BtnLimpiar_Click;
-            tarjetaConfig.Controls.Add(btnLimpiar);
-
-            scrollPanel.Controls.Add(tarjetaConfig);
+            col3.Controls.Add(btnEnviar);
+            col3.Controls.Add(btnPausar);
+            col3.Controls.Add(btnLimpiar);
 
             CargarPuertos();
         }
+
+        // Helper separador para col2 (sin padding izquierdo fijo)
+        private Panel Sep2(int y, int w) =>
+            new Panel { Location = new Point(0, y), Size = new Size(w, 1), BackColor = Color.FromArgb(220, 220, 220) };
 
         // ════════════════════════════════════════════════════════
         //  HELPERS UI
