@@ -74,6 +74,21 @@ namespace Carrito1
             IniciarXbox();
         }
 
+
+        private bool motoresAplicados = false;
+        private bool calibracionAplicada = false;
+
+
+        private void VerificarHabilitar()
+        {
+            bool habilitar = motoresAplicados && calibracionAplicada;
+            btnEnviar.Enabled = habilitar;
+            btnPausar.Enabled = habilitar;
+            btnModoManual.Enabled = habilitar;
+            btnModoAuto.Enabled = habilitar;
+            btnLimpiar.Enabled = habilitar;
+        }
+
         // ════════════════════════════════════════════════════════
         //  CONSTRUCCIÓN DE LA UI
         // ════════════════════════════════════════════════════════
@@ -306,11 +321,11 @@ namespace Carrito1
             int lw = (pw - 30) / 2 - 5;
             // Empuje izq
             panelMotores.Controls.Add(new Label { Text = "Empuje Izq (giro L):", Location = new Point(mx, my + 4), AutoSize = true, Font = new Font("Segoe UI", 9), ForeColor = Color.FromArgb(120, 60, 0) });
-            txtEmpujeIzq = new TextBox { Location = new Point(mx + 145, my), Size = new Size(55, 26), Text = "230", Font = new Font("Segoe UI", 11) };
+            txtEmpujeIzq = new TextBox { Location = new Point(mx + 145, my), Size = new Size(55, 26), Text = "150", Font = new Font("Segoe UI", 11) };
             panelMotores.Controls.Add(txtEmpujeIzq);
             // Empuje der
             panelMotores.Controls.Add(new Label { Text = "Empuje Der (giro R):", Location = new Point(mx + lw + 10, my + 4), AutoSize = true, Font = new Font("Segoe UI", 9), ForeColor = Color.FromArgb(120, 60, 0) });
-            txtEmpujeDer = new TextBox { Location = new Point(mx + lw + 155, my), Size = new Size(55, 26), Text = "230", Font = new Font("Segoe UI", 11) };
+            txtEmpujeDer = new TextBox { Location = new Point(mx + lw + 155, my), Size = new Size(55, 26), Text = "170", Font = new Font("Segoe UI", 11) };
             panelMotores.Controls.Add(txtEmpujeDer);
 
             my += 34;
@@ -328,6 +343,9 @@ namespace Carrito1
                 }
                 else
                     MessageBox.Show("Valores inválidos.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                motoresAplicados = true;
+                VerificarHabilitar();
             };
             panelMotores.Controls.Add(btnAplicarMotores);
 
@@ -356,7 +374,7 @@ namespace Carrito1
             panelCal.Controls.Add(new Label { Text = "pulsos / cm", Location = new Point(cx, cy), AutoSize = true, Font = new Font("Segoe UI", 9) });
             panelCal.Controls.Add(new Label { Text = "pulsos / 90°", Location = new Point(cx + 160, cy), AutoSize = true, Font = new Font("Segoe UI", 9) });
             cy += 20;
-            txtPpc = new TextBox { Location = new Point(cx, cy), Size = new Size(75, 26), Text = "0.8", Font = new Font("Segoe UI", 11) };
+            txtPpc = new TextBox { Location = new Point(cx, cy), Size = new Size(75, 26), Text = "0.7", Font = new Font("Segoe UI", 11) };
             txtGiro = new TextBox { Location = new Point(cx + 160, cy), Size = new Size(75, 26), Text = "14", Font = new Font("Segoe UI", 11) };
             panelCal.Controls.Add(txtPpc);
             panelCal.Controls.Add(txtGiro);
@@ -371,6 +389,9 @@ namespace Carrito1
                     EnviarComando($"CFG,{ppc:0.0},{g}");
                 else
                     MessageBox.Show("Valores inválidos.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                calibracionAplicada = true;
+                VerificarHabilitar();
             };
             panelCal.Controls.Add(btnAplicarCfg);
 
@@ -421,6 +442,12 @@ namespace Carrito1
             col3.Controls.Add(btnLimpiar);
 
             CargarPuertos();
+
+            btnEnviar.Enabled = false;
+            btnPausar.Enabled = false;
+            btnModoManual.Enabled = false;
+            btnModoAuto.Enabled = false;
+            btnLimpiar.Enabled = false;
         }
 
         // Helper separador para col2 (sin padding izquierdo fijo)
@@ -557,18 +584,20 @@ namespace Carrito1
         {
             if (!VerificarConexion()) return;
             modoManualActivo = true;
+            EnviarComando("MODE,MANUAL");  // ← línea nueva
             lblModoActual.Text = "Modo actual: Manual (D-Pad activo)";
             btnModoManual.BackColor = Color.FromArgb(55, 180, 125);
             btnModoAuto.BackColor = Color.FromArgb(80, 80, 80);
-            ultimaDireccionXbox = ""; // reset para forzar re-envío
+            ultimaDireccionXbox = "";
         }
 
         private void BtnModoAuto_Click(object sender, EventArgs e)
         {
             if (!VerificarConexion()) return;
             modoManualActivo = false;
-            EnviarComando("S"); // detener si estaba en manual
-            lblModoActual.Text = "Modo actual: Autónomo";
+            EnviarComando("S");
+            EnviarComando("MODE,AUTO");    // ← línea nueva
+            lblModoActual.Text = "Modo actual: Autonomo";
             btnModoAuto.BackColor = Color.FromArgb(55, 180, 125);
             btnModoManual.BackColor = Color.FromArgb(80, 80, 80);
         }
